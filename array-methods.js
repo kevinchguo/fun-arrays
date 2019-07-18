@@ -1,4 +1,4 @@
-var dataset = require('./dataset.json');
+var dataset = require("./dataset.json");
 
 /*
   create an array with accounts from bankBalances that are
@@ -7,8 +7,30 @@ var dataset = require('./dataset.json');
 */
 var hundredThousandairs = null;
 
+//balances refer to each object in the bankBalances object
+hundredThousandairs = dataset.bankBalances.filter(function(
+  balances,
+  index,
+  array
+) {
+  //balances.amount gets the $$$
+  if (parseInt(balances.amount) > 100000) {
+    return balances.amount;
+  }
+});
+
 // set sumOfBankBalances to be the sum of all value held at `amount` for each bank object
 var sumOfBankBalances = null;
+
+sumOfBankBalances = dataset.bankBalances.reduce(function(
+  previousValue,
+  currentValue,
+  index,
+  array
+) {
+  return previousValue + parseInt(currentValue.amount);
+},
+0);
 
 /*
   from each of the following states:
@@ -106,15 +128,14 @@ var areStatesInHigherStateSum = null;
  */
 var anyStatesInHigherStateSum = null;
 
-
 module.exports = {
-  hundredThousandairs : hundredThousandairs,
-  sumOfBankBalances : sumOfBankBalances,
-  sumOfInterests : sumOfInterests,
-  sumOfHighInterests : sumOfHighInterests,
-  stateSums : stateSums,
-  lowerSumStates : lowerSumStates,
-  higherStateSums : higherStateSums,
-  areStatesInHigherStateSum : areStatesInHigherStateSum,
-  anyStatesInHigherStateSum : anyStatesInHigherStateSum
+  hundredThousandairs: hundredThousandairs,
+  sumOfBankBalances: sumOfBankBalances,
+  sumOfInterests: sumOfInterests,
+  sumOfHighInterests: sumOfHighInterests,
+  stateSums: stateSums,
+  lowerSumStates: lowerSumStates,
+  higherStateSums: higherStateSums,
+  areStatesInHigherStateSum: areStatesInHigherStateSum,
+  anyStatesInHigherStateSum: anyStatesInHigherStateSum
 };
