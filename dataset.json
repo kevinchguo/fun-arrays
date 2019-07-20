@@ -1,5 +1,5 @@
 {
-  "bankBalances" : [
+  "bankBalances": [
     {
       "amount": "822370",
       "state": "ME"
@@ -85,7 +85,7 @@
       "state": "UT"
     },
     {
-      "amount": "609216",
+      "amount": "609216"
       "state": "VA"
     },
     {

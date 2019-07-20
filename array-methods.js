@@ -36,7 +36,7 @@ sumOfBankBalances = dataset.bankBalances.reduce(function(prev, curr) {
  */
 var sumOfInterests = null;
 
-var sumOfInterests = dataset.bankBalances
+sumOfInterests = dataset.bankBalances
   .filter(function(currState) {
     if (
       currState.state === "WI" ||
@@ -52,6 +52,7 @@ var sumOfInterests = dataset.bankBalances
   .reduce(function(prev, curr) {
     return Math.round(prev + parseInt(curr.amount) * 0.189);
   }, 0);
+
 /*
   aggregate the sum of bankBalance amounts
   grouped by state
@@ -98,37 +99,20 @@ stateSums = dataset.bankBalances.reduce(function(prev, curr) {
   )
  */
 var sumOfHighInterests = null;
-
-var stateSum = dataset.bankBalances
-  .filter(function(notTheseStates) {
-    //does not include these use && not ||
-    if (
-      notTheseStates.state !== "WI" &&
-      notTheseStates.state !== "IL" &&
-      notTheseStates.state !== "WY" &&
-      notTheseStates.state !== "OH" &&
-      notTheseStates.state !== "GA" &&
-      notTheseStates.state !== "DE"
-    ) {
-      return notTheseStates;
-    }
-  })
-  //Adds sum of all state's amounts
+//Puts the stateSums object into an array so I can reduce it
+sumOfHighInterests = Object.entries(stateSums)
   .reduce(function(prev, curr) {
-    if (!prev[curr.state]) {
-      prev[curr.state] = parseInt(curr.amount);
-    } else {
-      prev[curr.state] += parseInt(curr.amount);
+    //includes returns true if there IS that item in the array, curr.state loops through each state in the bankBalances obj
+    if (!["WI", "IL", "WY", "OH", "GA", "DE"].includes(curr[0])) {
+      if (Math.round(curr[1] * 0.189) > 50000) {
+        prev.push(Math.round(curr[1] * 0.189));
+      }
     }
     return prev;
-  }, {});
-//If the interest of that statesum is over 50k then add to sumOfHighInterests
-for (let x in stateSum) {
-  if (Math.round(stateSum[x] * 0.189) > 50000) {
-    sumOfHighInterests += Math.round(stateSum[x] * 0.189);
-  }
-}
-
+  }, [])
+  .reduce(function(prev, curr) {
+    return prev + curr;
+  }, 0);
 /*
   set `lowerSumStates` to be an array of two letter state
   abbreviations of each state where the sum of amounts
@@ -136,26 +120,29 @@ for (let x in stateSum) {
  */
 var lowerSumStates = null;
 
-var poorStates = dataset.bankBalances.reduce(function(prev, curr) {
-  if (!prev[curr.state]) {
-    prev[curr.state] = parseInt(curr.amount);
-  } else {
-    prev[curr.state] += curr.amount;
-  }
-  for (let x in prev) {
-    if (prev[x] > 1000000) {
-      delete prev[x];
-    }
+lowerSumStates = Object.entries(stateSums).reduce(function(prev, curr) {
+  if (curr[1] < 1000000) {
+    prev.push(curr[0]);
   }
   return prev;
-}, {});
-console.log(poorStates);
+}, []);
+
 /*
   aggregate the sum of each state into one hash table
   `higherStateSums` should be the sum of all states with totals greater than 1,000,000
  */
 var higherStateSums = null;
 
+higherStateSums = Object.entries(stateSums)
+  .reduce(function(prev, curr) {
+    if (curr[1] > 1000000) {
+      prev.push(curr[1]);
+    }
+    return prev;
+  }, [])
+  .reduce(function(prev, curr) {
+    return prev + curr;
+  }, 0);
 /*
   from each of the following states:
     Wisconsin
@@ -172,6 +159,12 @@ var higherStateSums = null;
   otherwise set it to `false`
  */
 var areStatesInHigherStateSum = null;
+//everything in this array HAS to be over the retun statement to return true else return false
+areStatesInHigherStateSum = Object.entries(stateSums).every(function(balances) {
+  if (!["WI", "IL", "WY", "OH", "GA", "DE"].includes(balances[0])) {
+    return balances[1] > 2550000;
+  }
+});
 
 /*
   Stretch Goal && Final Boss
@@ -188,7 +181,12 @@ var areStatesInHigherStateSum = null;
   otherwise set it to be `false`
  */
 var anyStatesInHigherStateSum = null;
-
+//If one thing in the array fulfills the return statement, it'll return true, if NOTHING in the array fulfills the return statement, it'll return false
+anyStatesInHigherStateSum = Object.entries(stateSums).some(function(balances) {
+  if (!["WI", "IL", "WY", "OH", "GA", "DE"].includes(balances[0])) {
+    return balances[1] > 2550000;
+  }
+});
 module.exports = {
   hundredThousandairs: hundredThousandairs,
   sumOfBankBalances: sumOfBankBalances,
