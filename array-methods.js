@@ -8,11 +8,7 @@ var dataset = require("./dataset.json");
 var hundredThousandairs = null;
 
 //balances refer to each object in the bankBalances object
-hundredThousandairs = dataset.bankBalances.filter(function(
-  balances,
-  index,
-  array
-) {
+hundredThousandairs = dataset.bankBalances.filter(function(balances) {
   //balances.amount gets the $$$
   if (parseInt(balances.amount) > 100000) {
     return balances.amount;
@@ -22,15 +18,10 @@ hundredThousandairs = dataset.bankBalances.filter(function(
 // set sumOfBankBalances to be the sum of all value held at `amount` for each bank object
 var sumOfBankBalances = null;
 
-sumOfBankBalances = dataset.bankBalances.reduce(function(
-  previousValue,
-  currentValue,
-  index,
-  array
-) {
-  return previousValue + parseInt(currentValue.amount);
-},
-0);
+sumOfBankBalances = dataset.bankBalances.reduce(function(prev, curr) {
+  //prev starts at 0 and added to the parsedint number of amount
+  return prev + parseInt(curr.amount);
+}, 0);
 
 /*
   from each of the following states:
@@ -45,6 +36,22 @@ sumOfBankBalances = dataset.bankBalances.reduce(function(
  */
 var sumOfInterests = null;
 
+var sumOfInterests = dataset.bankBalances
+  .filter(function(currState) {
+    if (
+      currState.state === "WI" ||
+      currState.state === "IL" ||
+      currState.state === "WY" ||
+      currState.state === "OH" ||
+      currState.state === "GA" ||
+      currState.state === "DE"
+    ) {
+      return currState;
+    }
+  })
+  .reduce(function(prev, curr) {
+    return Math.round(prev + parseInt(curr.amount) * 0.189);
+  }, 0);
 /*
   aggregate the sum of bankBalance amounts
   grouped by state
@@ -63,6 +70,16 @@ var sumOfInterests = null;
  */
 var stateSums = null;
 
+stateSums = dataset.bankBalances.reduce(function(prev, curr) {
+  //if that key doesnt exist, then make the key with the amount being the value, else if there is that key inside, then update amount
+  if (!prev[curr.state]) {
+    prev[curr.state] = parseInt(curr.amount);
+  } else {
+    prev[curr.state] += parseInt(curr.amount);
+  }
+  //returns the newly created obj from the if statement
+  return prev;
+}, {});
 /*
   for all states *NOT* in the following states:
     Wisconsin
@@ -82,6 +99,36 @@ var stateSums = null;
  */
 var sumOfHighInterests = null;
 
+var stateSum = dataset.bankBalances
+  .filter(function(notTheseStates) {
+    //does not include these use && not ||
+    if (
+      notTheseStates.state !== "WI" &&
+      notTheseStates.state !== "IL" &&
+      notTheseStates.state !== "WY" &&
+      notTheseStates.state !== "OH" &&
+      notTheseStates.state !== "GA" &&
+      notTheseStates.state !== "DE"
+    ) {
+      return notTheseStates;
+    }
+  })
+  //Adds sum of all state's amounts
+  .reduce(function(prev, curr) {
+    if (!prev[curr.state]) {
+      prev[curr.state] = parseInt(curr.amount);
+    } else {
+      prev[curr.state] += parseInt(curr.amount);
+    }
+    return prev;
+  }, {});
+//If the interest of that statesum is over 50k then add to sumOfHighInterests
+for (let x in stateSum) {
+  if (Math.round(stateSum[x] * 0.189) > 50000) {
+    sumOfHighInterests += Math.round(stateSum[x] * 0.189);
+  }
+}
+
 /*
   set `lowerSumStates` to be an array of two letter state
   abbreviations of each state where the sum of amounts
@@ -89,6 +136,20 @@ var sumOfHighInterests = null;
  */
 var lowerSumStates = null;
 
+var poorStates = dataset.bankBalances.reduce(function(prev, curr) {
+  if (!prev[curr.state]) {
+    prev[curr.state] = parseInt(curr.amount);
+  } else {
+    prev[curr.state] += curr.amount;
+  }
+  for (let x in prev) {
+    if (prev[x] > 1000000) {
+      delete prev[x];
+    }
+  }
+  return prev;
+}, {});
+console.log(poorStates);
 /*
   aggregate the sum of each state into one hash table
   `higherStateSums` should be the sum of all states with totals greater than 1,000,000
