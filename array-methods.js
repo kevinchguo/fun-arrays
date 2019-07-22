@@ -35,23 +35,12 @@ sumOfBankBalances = dataset.bankBalances.reduce(function(prev, curr) {
   and then sum it all up into one value saved to `sumOfInterests`
  */
 var sumOfInterests = null;
-
-sumOfInterests = dataset.bankBalances
-  .filter(function(currState) {
-    if (
-      currState.state === "WI" ||
-      currState.state === "IL" ||
-      currState.state === "WY" ||
-      currState.state === "OH" ||
-      currState.state === "GA" ||
-      currState.state === "DE"
-    ) {
-      return currState;
-    }
-  })
-  .reduce(function(prev, curr) {
-    return Math.round(prev + parseInt(curr.amount) * 0.189);
-  }, 0);
+sumOfInterests = dataset.bankBalances.reduce(function(prev, curr) {
+  if (["WI", "IL", "WY", "OH", "GA", "DE"].includes(curr.state)) {
+    prev = Math.round(prev + parseInt(curr.amount) * 0.189);
+  }
+  return prev;
+}, 0);
 
 /*
   aggregate the sum of bankBalance amounts
@@ -100,19 +89,16 @@ stateSums = dataset.bankBalances.reduce(function(prev, curr) {
  */
 var sumOfHighInterests = null;
 //Puts the stateSums object into an array so I can reduce it
-sumOfHighInterests = Object.entries(stateSums)
-  .reduce(function(prev, curr) {
-    //includes returns true if there IS that item in the array, curr.state loops through each state in the bankBalances obj
-    if (!["WI", "IL", "WY", "OH", "GA", "DE"].includes(curr[0])) {
-      if (Math.round(curr[1] * 0.189) > 50000) {
-        prev.push(Math.round(curr[1] * 0.189));
-      }
+sumOfHighInterests = Object.entries(stateSums).reduce(function(prev, curr) {
+  //includes returns true if there IS that item in the array, curr.state loops through each state in the bankBalances obj
+  console.log(curr[0], curr[1]);
+  if (!["WI", "IL", "WY", "OH", "GA", "DE"].includes(curr[0])) {
+    if (Math.round(curr[1] * 0.189) > 50000) {
+      prev = Math.round(prev + parseInt(curr[1]) * 0.189);
     }
-    return prev;
-  }, [])
-  .reduce(function(prev, curr) {
-    return prev + curr;
-  }, 0);
+  }
+  return prev;
+}, 0);
 /*
   set `lowerSumStates` to be an array of two letter state
   abbreviations of each state where the sum of amounts
