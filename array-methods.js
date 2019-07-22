@@ -91,7 +91,6 @@ var sumOfHighInterests = null;
 //Puts the stateSums object into an array so I can reduce it
 sumOfHighInterests = Object.entries(stateSums).reduce(function(prev, curr) {
   //includes returns true if there IS that item in the array, curr.state loops through each state in the bankBalances obj
-  console.log(curr[0], curr[1]);
   if (!["WI", "IL", "WY", "OH", "GA", "DE"].includes(curr[0])) {
     if (Math.round(curr[1] * 0.189) > 50000) {
       prev = Math.round(prev + parseInt(curr[1]) * 0.189);
